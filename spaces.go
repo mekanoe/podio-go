@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 type Space struct {
@@ -88,11 +89,12 @@ func (c *Client) CreateSpace(params CreateSpaceParams) (*Space, error) {
 	}
 
 	data := &struct {
+		ID  int    `json:"space_id"`
 		Url string `json:"url"`
 	}{}
 	json.NewDecoder(resp.Body).Decode(data)
 
-	space, err := c.GetSpaceByURL(data.Url)
+	space, err := c.GetSpace(strconv.Itoa(data.ID))
 	if err != nil {
 		return nil, fmt.Errorf("podio-go: failed to get space after creation: %w", err)
 	}
@@ -121,4 +123,36 @@ func (c *Client) DeleteSpace(spaceID string) error {
 	}
 
 	return nil
+}
+
+func (c *Client) UpdateSpace(spaceID string, params CreateSpaceParams) (*Space, error) {
+	body := &bytes.Buffer{}
+	err := json.NewEncoder(body).Encode(params)
+	if err != nil {
+		return nil, fmt.Errorf("podio-go: failed to update space request: %w", err)
+	}
+
+	url, err := url.Parse(fmt.Sprintf("/space/%s", spaceID))
+	if err != nil {
+		return nil, fmt.Errorf("podio-go: update space failed to create url: %w", err)
+	}
+	req := &http.Request{
+		Method: "PUT",
+		URL:    url,
+		Body:   body,
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("podio-go: update space failed to send request: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		output, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(output))
+		return nil, fmt.Errorf("podio-go: update space failed: status code %d", resp.StatusCode)
+	}
+
+	space := &Space{}
+	json.NewDecoder(resp.Body).Decode(space)
+	return space, nil
 }
