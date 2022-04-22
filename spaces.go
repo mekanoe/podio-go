@@ -62,12 +62,12 @@ func (c *Client) GetSpaceByURL(url string) (*Space, error) {
 }
 
 type CreateSpaceParams struct {
-	Name            string `json:"name"`
-	OrgID           int    `json:"org_id"`
-	Privacy         string `json:"privacy"`
-	PostOnNewApp    bool   `json:"post_on_new_app"`
-	PostOnNewMember bool   `json:"post_on_new_member"`
-	AutoJoin        bool   `json:"auto_join"`
+	Name            string `json:"name,omitempty"`
+	OrgID           int    `json:"org_id,omitempty"`
+	Privacy         string `json:"privacy,omitempty"`
+	PostOnNewApp    bool   `json:"post_on_new_app,omitempty"`
+	PostOnNewMember bool   `json:"post_on_new_member,omitempty"`
+	AutoJoin        bool   `json:"auto_join,omitempty"`
 }
 
 func (c *Client) CreateSpace(params CreateSpaceParams) (*Space, error) {
@@ -139,20 +139,20 @@ func (c *Client) UpdateSpace(spaceID string, params CreateSpaceParams) (*Space, 
 	req := &http.Request{
 		Method: "PUT",
 		URL:    url,
-		Body:   body,
+		Body:   ioutil.NopCloser(body),
 	}
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("podio-go: update space failed to send request: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusNoContent {
 		output, _ := ioutil.ReadAll(resp.Body)
 		fmt.Println(string(output))
 		return nil, fmt.Errorf("podio-go: update space failed: status code %d", resp.StatusCode)
 	}
 
-	space := &Space{}
-	json.NewDecoder(resp.Body).Decode(space)
-	return space, nil
+	space, err := c.GetSpace(spaceID)
+	return space, err
 }

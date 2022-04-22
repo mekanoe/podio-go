@@ -81,4 +81,19 @@ func main() {
 
 		fmt.Println("Space deleted")
 	}
+
+	if os.Args[1] == "rename-space" {
+		spaceID := os.Args[2]
+		newName := os.Args[3]
+
+		space, err := client.UpdateSpace(spaceID, podio.CreateSpaceParams{
+			Name: newName,
+		})
+		if err != nil {
+			fmt.Println("Failed to update space:", err)
+			os.Exit(1)
+		}
+
+		outputEncoder.Encode(space)
+	}
 }
