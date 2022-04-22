@@ -91,18 +91,21 @@ type oAuth2Token struct {
 	RefreshToken string `json:"refresh_token"`
 	Ref          struct {
 		Type string `json:"type"`
-		ID   string `json:"id"`
+		ID   uint64 `json:"id"`
 	} `json:"ref"`
 }
 
 func (c *Client) doOAuthGrant(credentials oAuth2Request) (*oAuth2Token, error) {
-	body := &bytes.Buffer{}
-	err := json.NewEncoder(body).Encode(credentials)
-	if err != nil {
-		return nil, err
-	}
+	body := url.Values{}
+	body.Set("grant_type", credentials.GrantType)
+	body.Set("username", credentials.Username)
+	body.Set("password", credentials.Password)
+	body.Set("client_id", credentials.ClientID)
+	body.Set("client_secret", credentials.ClientSecret)
 
-	resp, err := c.httpClient.Post("/oauth/token", "application/x-www-form-urlencoded", body)
+	buf := bytes.NewBufferString(body.Encode())
+
+	resp, err := c.httpClient.Post("/oauth/token", "application/x-www-form-urlencoded", buf)
 	if err != nil {
 		return nil, fmt.Errorf("podio-go: failed to request OAuth token: %w", err)
 	}
@@ -111,7 +114,7 @@ func (c *Client) doOAuthGrant(credentials oAuth2Request) (*oAuth2Token, error) {
 		return nil, fmt.Errorf("podio-go: failed to request OAuth token: %s", resp.Status)
 	}
 
-	var token *oAuth2Token
+	token := &oAuth2Token{}
 	err = json.NewDecoder(resp.Body).Decode(token)
 	if err != nil {
 		return nil, fmt.Errorf("podio-go: failed to decode OAuth token: %w", err)
