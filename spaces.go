@@ -14,6 +14,7 @@ type Space struct {
 	ID              int      `json:"space_id"`
 	Name            string   `json:"name,omitempty"`
 	URL             string   `json:"url,omitempty"`
+	OrgID           int      `json:"org_id,omitempty"`
 	Privacy         string   `json:"privacy,omitempty"`
 	AutoJoin        bool     `json:"auto_join,omitempty"`
 	URLLabel        string   `json:"url_label,omitempty"`
@@ -84,8 +85,8 @@ func (c *Client) CreateSpace(params CreateSpaceParams) (*Space, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		output, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println(string(output))
-		return nil, fmt.Errorf("podio-go: failed to create space: status code %d", resp.StatusCode)
+
+		return nil, fmt.Errorf("podio-go: failed to create space: status code %d; return payload: %s", resp.StatusCode, string(output))
 	}
 
 	data := &struct {

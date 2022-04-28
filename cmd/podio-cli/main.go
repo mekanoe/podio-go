@@ -96,4 +96,5 @@ func main() {
 
 		outputEncoder.Encode(space)
 	}
+
 }

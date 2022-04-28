@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -111,7 +112,8 @@ func (c *Client) doOAuthGrant(credentials oAuth2Request) (*oAuth2Token, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("podio-go: failed to request OAuth token: %s", resp.Status)
+		output, _ := ioutil.ReadAll(resp.Body)
+		return nil, fmt.Errorf("podio-go: failed to request OAuth token: %s; body: %s", resp.Status, string(output))
 	}
 
 	token := &oAuth2Token{}
