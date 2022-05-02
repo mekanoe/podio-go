@@ -1,6 +1,6 @@
 package podio
 
-type CreatedBy struct {
+type User struct {
 	UserID     int    `json:"user_id,omitempty"`
 	SpaceID    int    `json:"space_id,omitempty"`
 	ProfileID  int    `json:"profile_id,omitempty"`

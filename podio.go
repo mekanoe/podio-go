@@ -77,6 +77,47 @@ func (c *Client) AuthenticateWithCredentials(username, password string) error {
 	return nil
 }
 
+func (c *Client) get(path string, v interface{}) error {
+	resp, err := c.httpClient.Get(path)
+	if err != nil {
+		return fmt.Errorf("podio-go: failed to GET %s: %w", path, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		output, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("podio-go: failed to GET %s: %s\nPayload: %s", path, resp.Status, string(output))
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(v)
+	if err != nil {
+		return fmt.Errorf("podio-go: failed to decode response: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) delete(path string) error {
+	url, err := url.Parse(path)
+	if err != nil {
+		return fmt.Errorf("podio-go: failed to parse URL: %w", err)
+	}
+	req := &http.Request{
+		Method: "DELETE",
+		URL:    url,
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("podio-go: failed to DELETE %s: %w", path, err)
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		output, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("podio-go: failed to DELETE %s: %s\nPayload: %s", path, resp.Status, string(output))
+	}
+
+	return nil
+}
+
 type oAuth2Request struct {
 	GrantType    string `json:"grant_type"`
 	Username     string `json:"username,omitempty"`
