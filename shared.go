@@ -5,7 +5,7 @@ type User struct {
 	SpaceID    int    `json:"space_id,omitempty"`
 	ProfileID  int    `json:"profile_id,omitempty"`
 	Name       string `json:"name,omitempty"`
-	Avatar     string `json:"avatar,omitempty"`
+	Avatar     int    `json:"avatar,omitempty"`
 	Type       string `json:"type,omitempty"`
 	LastSeenOn string `json:"last_seen_on,omitempty"`
 	Link       string `json:"link,omitempty"`

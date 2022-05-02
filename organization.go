@@ -11,7 +11,7 @@ type Organization struct {
 	URLLabel     string   `json:"url_label,omitempty"`
 	Status       string   `json:"status,omitempty"`
 	Premium      bool     `json:"premium,omitempty"`
-	Logo         string   `json:"logo,omitempty"`
+	Logo         int      `json:"logo,omitempty"`
 	UserLimit    int      `json:"user_limit,omitempty"`
 	Type         string   `json:"type,omitempty"`
 	Segment      string   `json:"segment,omitempty"`
