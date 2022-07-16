@@ -115,3 +115,9 @@ func (c *Client) UpdateSpace(spaceID string, params CreateSpaceParams) (*Space, 
 	space, err := c.GetSpace(spaceID)
 	return space, err
 }
+
+func (c *Client) GetWorkSpaces(orgID string) (*[]Space, error) {
+	orgs := &[]Space{}
+	err := c.get(fmt.Sprintf("/space/org/%s/", orgID), orgs)
+	return orgs, err
+}

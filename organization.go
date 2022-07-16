@@ -36,3 +36,9 @@ func (c *Client) GetOrganizationBySlug(orgSlug string) (*Organization, error) {
 	err := c.get(fmt.Sprintf("/org/url?url=https://podio.com/%s", orgSlug), org)
 	return org, err
 }
+
+func (c *Client) GetOrganizations() (*[]Organization, error) {
+	orgs := &[]Organization{}
+	err := c.get("/org/", orgs)
+	return orgs, err
+}

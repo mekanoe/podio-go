@@ -103,39 +103,6 @@ type AppTask struct {
 	Responsible []User `json:"responsible,omitempty"`
 }
 
-type Field struct {
-	// "field_id": The id of the field,
-	FieldID int `json:"field_id,omitempty"`
-	// "type": The type of the field (see area for more information),
-	Type string `json:"type,omitempty"`
-	// "external_id": External id automatically generated that will never change,
-	ExternalID string `json:"external_id,omitempty"`
-	// "config": The configuration of the field,
-	Config FieldConfig `json:"config,omitempty"`
-}
-
-type FieldConfig struct {
-	// "label": The label of the field, which is what the users will see,
-	Label string `json:"label,omitempty"`
-	// "description": The description of the field, shown to the user when inserting and editing,
-	Description string `json:"description,omitempty"`
-	// "delta": An integer indicating the order of the field compared to other fields,
-	Delta int `json:"delta,omitempty"`
-	// "settings": The settings of the field which depends on the type of the field (see area for more information),
-	Settings interface{} `json:"settings,omitempty"`
-	// "mapping": The mapping of the field, one of "meeting_time", "meeting_participants", "meeting_agenda" and "meeting_location" for type="meeting" and "contact_name","contact_job_title","contact_organization","contact_email","contact_phone","contact_address","contact_website","contact_notes","contact_image" for type="contact"
-	Mapping string `json:"mapping,omitempty"`
-	// "required": True if the field is required when creating and editing items, false otherwise
-	Required bool `json:"required,omitempty"`
-}
-
-type FieldDelete struct {
-	// "field_id": The id of the field,
-	FieldID int `json:"field_id,omitempty"`
-	// "delete_values": True if the values for the field should be deleted, false otherwise
-	DeleteValues bool `json:"delete_values,omitempty"`
-}
-
 type AppIntegration struct {
 	// "status": The status of the integration, either "inactive", "active", "disabled", or "error".
 	Status string `json:"status,omitempty"`
@@ -178,6 +145,7 @@ func (c *Client) CreateApplication(spaceID string, params CreateApplicationParam
 		return nil, fmt.Errorf("podio-go: failed to create application: %s\nPayload: %s", resp.Status, string(output))
 	}
 
+	//This line defines a struct type and simultaneously creates an empty struct
 	data := &struct {
 		AppID int `json:"app_id"`
 	}{}
@@ -218,4 +186,10 @@ func (c *Client) UpdateApplication(appID string, params CreateApplicationParams)
 
 func (c *Client) DeleteApplication(appID string) error {
 	return c.delete(fmt.Sprintf("/app/%s", appID))
+}
+
+func (c *Client) GetApplications(spaceID string) (*[]Application, error) {
+	apps := &[]Application{}
+	err := c.get(fmt.Sprintf("/app/space/%s/?include_inactive=false", spaceID), apps)
+	return apps, err
 }
