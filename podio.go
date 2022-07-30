@@ -110,7 +110,7 @@ func (c *Client) delete(path string) error {
 		return fmt.Errorf("podio-go: failed to DELETE %s: %w", path, err)
 	}
 
-	if resp.StatusCode != http.StatusNoContent {
+	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
 		output, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("podio-go: failed to DELETE %s: %s\nPayload: %s", path, resp.Status, string(output))
 	}

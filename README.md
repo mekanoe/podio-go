@@ -70,7 +70,7 @@ podio-cli applications <spaceID>
 Read an application:
 * `<appID>` is a number
 ```
-podio-cli application <appID>
+podio-cli app <appID>
 ```
 
 Create a field within an app
